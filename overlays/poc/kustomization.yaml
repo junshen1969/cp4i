@@ -3,3 +3,4 @@ kind: Kustomization
 namespace: mq1
 resources:
 - mq1-qm.yaml
+- mq1-ns.yaml
