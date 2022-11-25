@@ -1,0 +1,27 @@
+apiVersion: mq.ibm.com/v1beta1
+kind: QueueManager
+metadata:
+  name: mqha
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector: {}
+            topologyKey: topology.kubernetes.io/zone
+          weight: 100
+  license:
+    accept: true
+    license: L-RJON-CD3JKX
+    use: Production
+  queueManager:
+    availability:
+      type: NativeHA
+    name: CUSTOM
+    storage:
+      defaultClass: gp3-customer-kms
+      queueManager:
+        type: persistent-claim
+  version: 9.3.0.1-r2
+  web:
+    enabled: true
