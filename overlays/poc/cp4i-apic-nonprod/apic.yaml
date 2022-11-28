@@ -1,0 +1,19 @@
+apiVersion: apiconnect.ibm.com/v1beta1
+kind: APIConnectCluster
+metadata:
+  labels:
+    app.kubernetes.io/instance: apiconnect
+    app.kubernetes.io/managed-by: ibm-apiconnect
+    app.kubernetes.io/name: apiconnect-minimum
+  name: apic
+  namespace: apic
+spec:
+  disabledServices:
+    - gateway
+  license:
+    accept: true
+    use: nonproduction
+    license: L-RJON-CEBLEH
+  profile: n3xc11.m48
+  version: 10.0.5.1
+  storageClassName: gp3-customer-kms
