@@ -1,0 +1,14 @@
+apiVersion: integration.ibm.com/v1beta1
+kind: PlatformNavigator
+metadata:
+  name: platformui
+  namespace: cp4i
+spec:
+  license:
+    accept: true
+    license: L-RJON-CD3JKX
+  storage:
+    class: aws-efs
+  mqDashboard: true
+  replicas: 3
+  version: 2022.2.1-4
