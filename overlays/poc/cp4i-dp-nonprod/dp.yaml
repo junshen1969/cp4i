@@ -1,0 +1,29 @@
+apiVersion: datapower.ibm.com/v1beta3
+kind: DataPowerService
+metadata:
+  name: dp01
+  namespace: dp
+spec:
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector: {}
+            topologyKey: topology.kubernetes.io/zone
+          weight: 100
+  license:
+    accept: true
+    license: L-RJON-CCAT5F
+    use: nonproduction
+  replicas: 2
+  resources:
+    limits:
+      memory: 8Gi
+    requests:
+      cpu: 4
+      memory: 4Gi
+  users:
+    - accessLevel: privileged
+      name: admin
+      passwordSecret: admin-credentials
+  version: 10.5-lts
