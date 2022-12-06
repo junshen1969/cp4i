@@ -4,6 +4,9 @@ metadata:
   name: platformui
   namespace: cp4i
 spec:
+  tls:
+    secretName: wsv-cp4i-tls-secret
+  uiHostname: wsv-cp4i.apps.worksafe.foys.p1.openshiftapps.com
   license:
     accept: true
     license: L-RJON-CD3JKX
