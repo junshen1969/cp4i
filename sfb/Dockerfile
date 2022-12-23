@@ -2,7 +2,7 @@ FROM registry.access.redhat.com/ubi8/ubi:8.0
 
 ARG MQ_URL=https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev931_linux_x86-64.tar.gz
 
-export DIR_EXTRACT=/tmp/mq
+ARG DIR_EXTRACT=/tmp/mq
 mkdir -p ${DIR_EXTRACT}
 cd ${DIR_EXTRACT}
 curl -LO $MQ_URL
