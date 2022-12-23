@@ -2,10 +2,10 @@ FROM registry.access.redhat.com/ubi8/ubi:8.0
 
 ARG MQ_URL=https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messaging/mqadv/mqadv_dev931_linux_x86-64.tar.gz
 
-ARG DIR_EXTRACT=/tmp/mq
-mkdir -p ${DIR_EXTRACT}
-cd ${DIR_EXTRACT}
+cd /tmp
+
 curl -LO $MQ_URL
+
 tar -zxvf ./*.tar.gz
 
 # ADD sfb.tar.gz /tmp/
