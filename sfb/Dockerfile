@@ -6,7 +6,7 @@ ARG MQ_URL=https://public.dhe.ibm.com/ibmdl/export/pub/software/websphere/messag
 RUN export DIR_EXTRACT=/tmp/mq \
   && mkdir -p ${DIR_EXTRACT} \
   && cd ${DIR_EXTRACT} \
-  && curl -LO $MQ_URL \
+  && curl -kLO $MQ_URL \
   && tar -zxvf ./*.tar.gz
 
 RUN groupadd -g 1001 mqm
