@@ -7,7 +7,7 @@ RUN export DIR_EXTRACT=/tmp/mq \
   && mkdir -p ${DIR_EXTRACT} \
   && cd ${DIR_EXTRACT} \
   && curl -kLO $MQ_URL \
-  && tar -zxvf ./*.tar.gz
+  && tar -xvf ./*.tar.gz
 
 RUN groupadd -g 1001 mqm
 RUN useradd -u 1001 -g mqm mqm
