@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cs-onprem-tenant-config
+  namespace: ibm-common-services
+labels:
+  cs_onprem_tenant_config: "true"
+data:
+  ##comment out or remove this setting if not changing the hostname
+  custom_hostname: cp-console.cp4i.iop-np.rosa.workcover.vic.gov.au
+  ##comment out or remove this setting if not changing the certificates
+  custom_host_certificate_secret: cpconsole-tls-secret

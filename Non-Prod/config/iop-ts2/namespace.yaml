@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: iop-ts2
+  annotations:
+    argocd.argocd.io/sync-wave: "-5"
+  labels:
+    argocd.argoproj.io/managed-by: gitops-cluster

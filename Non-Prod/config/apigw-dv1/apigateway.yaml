@@ -1,0 +1,60 @@
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+apiVersion: gateway.apiconnect.ibm.com/v1beta1
+kind: GatewayCluster
+metadata:
+  name: apigw
+  namespace: apigw-dv1
+  labels: {
+    app.kubernetes.io/instance: "gateway",
+    app.kubernetes.io/managed-by: "ibm-apiconnect",
+    app.kubernetes.io/name: "apigw"
+  }
+spec:
+  version: 10.0.5.2
+  profile: n3xc4.m8
+  apicGatewayServiceV5CompatibilityMode: false
+  gatewayEndpoint:
+    hosts:
+    - name: apigw-dv1.iop-np.rosa.workcover.vic.gov.au
+      secretName: apigw-tls-secret
+  gatewayManagerEndpoint:
+    annotations:
+      cert-manager.io/issuer: ingress-issuer
+    hosts:
+    - name: gwd-aapigw-dv1.apps.???.com
+      secretName: apigw-manager-endpoint
+  apicGatewayServiceTLS:
+    secretName: gateway-service
+  apicGatewayPeeringTLS:
+    secretName: gateway-peering
+  datapowerLogLevel: 3
+  license:
+    accept: true
+    use: nonproduction
+    license: 'L-GVEN-GFUPVE'
+  tokenManagementService:
+    enabled: true
+    storage:
+      storageClassName: gp3-customer-kms
+      volumeSize: 30Gi
+  adminUser:
+    secretName: admin-secret
+  # syslogConfig:
+  #   enabled: false # if true, provide below details
+  #   remoteHost:  # must be a string
+  #   remotePort:  # must be an int
+  #   secretName:  # must be a string

@@ -1,0 +1,17 @@
+apiVersion: integration.ibm.com/v1beta1
+kind: PlatformNavigator
+metadata:
+  name: platformui
+  namespace: cp4i
+spec:
+  tls:
+    secretName: platformui-tls-secret
+  uiHostname: cp-platform-ui.cp4i.iop-np.rosa.workcover.vic.gov.au
+  license:
+    accept: true
+    license: L-RJON-CJR2RX
+  storage:
+    class: aws-efs
+  mqDashboard: true
+  replicas: 3
+  version: 2022.4.1

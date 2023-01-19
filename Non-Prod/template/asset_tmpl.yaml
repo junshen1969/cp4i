@@ -1,0 +1,16 @@
+apiVersion: integration.ibm.com/v1beta1
+kind: AssetRepository
+metadata:
+  name: asset
+  namespace: cp4i
+spec:
+  license:
+    accept: true
+    license: L-RJON-CD3JKX
+  replicas: ${replicas}
+  storage:
+    assetDataVolume:
+      class: ${filestorage}
+    couchVolume:
+      class: ${blockstorage}
+  version: 2022.2.1-4

@@ -1,0 +1,16 @@
+apiVersion: integration.ibm.com/v1beta1
+kind: AssetRepository
+metadata:
+  name: asset
+  namespace: cp4i
+spec:
+  license:
+    accept: true
+    license: L-RJON-CD3JKX
+  replicas: 1
+  storage:
+    assetDataVolume:
+      class: aws-efs
+    couchVolume:
+      class: gp3-customer-kms
+  version: 2022.2.1-4

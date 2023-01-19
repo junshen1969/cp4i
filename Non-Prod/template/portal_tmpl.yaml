@@ -1,0 +1,65 @@
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+
+apiVersion: portal.apiconnect.ibm.com/v1beta1
+kind: PortalCluster
+metadata:
+  name: portal
+  namespace: apic
+  labels: {
+    app.kubernetes.io/instance: "portal",
+    app.kubernetes.io/managed-by: "ibm-apiconnect",
+    app.kubernetes.io/name: "portal"
+  }
+spec:
+  version: 10.0.5.2
+  profile: ${profile}
+  portalAdminEndpoint:
+    annotations:
+      cert-manager.io/issuer: apic-ingress-issuer
+    hosts:
+    - name: ${portalAdminEndpoint}
+      secretName: portal-director-secret
+  portalUIEndpoint:
+    hosts:
+    - name: ${portalUIEndpoint}
+      secretName: portal-tls-secret
+  databaseVolumeClaimTemplate:
+    storageClassName: ${blockstorage}
+    volumeSize: 15Gi
+  databaseLogsVolumeClaimTemplate:
+    storageClassName: ${blockstorage}
+    volumeSize: 6Gi
+  webVolumeClaimTemplate:
+    storageClassName: ${blockstorage}
+    volumeSize: 8Gi
+  backupVolumeClaimTemplate:
+    storageClassName: ${blockstorage}
+    volumeSize: 15Gi
+  adminVolumeClaimTemplate:
+    storageClassName: ${blockstorage}
+    volumeSize: 6Gi
+  certVolumeClaimTemplate:
+    storageClassName: ${blockstorage}
+    volumeSize: 4Gi
+  adminClientSubjectDN: CN=ptl-adm-client
+  microServiceSecurity: certManager
+  certManagerIssuer:
+    name: apic-self-signed
+    kind: Issuer
+  license:
+    accept: true
+    use: ${licensetype}
+    license: L-GVEN-GFUPVE

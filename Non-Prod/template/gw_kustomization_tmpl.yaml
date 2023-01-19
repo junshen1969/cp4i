@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: ${namespace}
+resources:
+- namespace.yaml
+- ingress-ca.yaml
+- admin-aws-secret.yaml
+- common-issuer-and-gateway-certs.yaml
+- apigateway.yaml
