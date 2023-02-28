@@ -1,0 +1,18 @@
+runmqakm -cert -add -db mqkey.kdb -label mqservercert -file TS1TM01.cer -format ascii -stashed
+runmqakm -cert -add -db mqkey.kdb -label winvmca -file WINVMCA1.cer -format ascii -stashed
+runmqakm -cert -add -db mqkey.kdb -label tacrootca -file TACRootCA.cer -format ascii -stashed
+
+
+runmqakm -cert -list -db mqkey.kdb -type cms -stashed
+
+runmqakm -cert -export -db mqkey.kdb -label ibmwebspheremqaceuser -target ibmwebspheremqaceuser.pk12 -target_pw password -target_type pkcs12 -stashed
+
+runmqckm -cert -export -db filename -pw password -label label -type cms -target filename -target_pw password -target_type pkcs12
+
+echo "#####################################################################################"
+echo "#### Listing ${CLIENT_KDB}"
+echo "#####################################################################################"
+runmqakm -cert -list -db ${CLIENT_KDB} -type cms -stashed
+
+#echo "#### Details of ${CLIENT_KDB}"
+runmqakm -cert -details -db ${CLIENT_KDB} -type cms -stashed -label ${CLIENT_CRT_NAME}

@@ -1,0 +1,123 @@
+****************************************************************************************************
+**                                                                                                **
+**        ATTENTION:                                                                              **
+**        New MQ Objects should generally be defined in dxcmq/mq-config/mq-config-objects.mqsc    **
+**                                                                                                **
+**        That is a common file used to configure the MQ queue manager in all environments        **
+**                                                                                                **
+**        Objects will then be created identically in all environments without having to be       **
+**        copied into the environment specific file each time a project is promoted.              **
+**                                                                                                **
+**        Where an environment needs a special definition of an object (such as a queue or topic) **
+**        a replacement definition should be created in this file.                                **
+**                                                                                                **
+**        Environment specific objects such as channels and transmission queues should be         **
+**        defined in this file so that they have custom values for each environment.              **
+**                                                                                                **
+****************************************************************************************************
+
+
+** CONFIGURING CHANNELS STARTS
+
+* Create channel for MQ administration
+DEFINE CHANNEL('TS1DMA301.ADMN.SVC') CHLTYPE(SVRCONN) REPLACE
+
+* Create channel for ACE.PRE.CLIENT
+DEFINE CHANNEL('ACE.PRE.CLIENT') CHLTYPE(SVRCONN) MCAUSER('app') SHARECNV(100) SSLCIPH(TLS_RSA_WITH_AES_256_GCM_SHA384) SSLPEER('CN=ACE-TS1 Client,OU=TS1/IBM MQ Client,O=ITSS,L=Geelong,ST=VIC,C=AU') CERTLABL('ibmwebspheremqts1dma301') SSLCAUTH(REQUIRED) REPLACE
+* DEFINE CHANNEL('TS1DMA301.MQSFB.SVC') CHLTYPE(SVRCONN) MCAUSER('app') TRPTYPE(TCP) SSLCIPH(TLS_RSA_WITH_AES_256_GCM_SHA384) SSLPEER('CN=MQSalesforceBridge-TS1 Client,OU=TS1/IBM MQ Client,O=ITSS,L=Geelong,ST=VIC,C=AU') REPLACE
+DEFINE CHANNEL('TS1DMA301.MQSFB.SVC') CHLTYPE(SVRCONN) MCAUSER('app') TRPTYPE(TCP) SSLCIPH(TLS_RSA_WITH_AES_256_GCM_SHA384) SSLPEER('CN=MQSalesforceBridge-TS1 Client,OU=TS1/IBM MQ Client,O=ITSS,L=Geelong,ST=VIC,C=AU') REPLACE
+
+* Create sender channel to EIP site 1 gateway QM
+DEFINE CHANNEL(TS1DMA301.TS1TG0101) CHLTYPE(SDR) TRPTYPE(TCP) SSLCIPH(TLS_RSA_WITH_AES_256_CBC_SHA256) SSLPEER('CN=TS1TG0101,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') CONNAME('stuwmq0101-ts1.services.workcover.vic.gov.au(1417)') XMITQ(XMITQ.GWY.PRIMARY) REPLACE
+
+* Create sender channel to EIP site 2 gateway QM
+DEFINE CHANNEL(TS1DMA301.TS1TG0201) CHLTYPE(SDR) TRPTYPE(TCP) SSLCIPH(TLS_RSA_WITH_AES_256_CBC_SHA256) SSLPEER('CN=TS1TG0201,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') CONNAME('stuwmq0201-ts1.services.workcover.vic.gov.au(1417)') XMITQ(XMITQ.GWY.BACKUP) REPLACE
+
+* Create receiver channel from EIP site 1 gateway QM
+DEFINE CHANNEL(TS1TG0101.TS1DMA301) CHLTYPE(RCVR) TRPTYPE(TCP) SSLCIPH(TLS_RSA_WITH_AES_256_CBC_SHA256) SSLPEER('CN=TS1TG0101,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') MCAUSER('*NOACCESS') REPLACE
+
+* Create receiver channel from EIP site 2 gateway QM
+DEFINE CHANNEL(TS1TG0201.TS1DMA301) CHLTYPE(RCVR) TRPTYPE(TCP) SSLCIPH(TLS_RSA_WITH_AES_256_CBC_SHA256) SSLPEER('CN=TS1TG0201,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') MCAUSER('*NOACCESS') REPLACE
+
+** CONFIGURING CHANNELS ENDS
+
+** CONFIGURING CHANNELS AUTH RECORDS STARTS
+SET CHLAUTH('ACE.PRE.CLIENT') TYPE(ADDRESSMAP) ADDRESS('*') USERSRC(CHANNEL) CHCKCLNT(REQUIRED) DESCR('Allows connection via APP.PRE.CLIENT channel') ACTION(REPLACE)
+SET CHLAUTH('TS1DMA301.MQSFB.SVC') TYPE(SSLPEERMAP) SSLPEER('CN=MQSalesforceBridge-TS1 Client,OU=TS1/IBM MQ Client,O=ITSS,L=Geelong,ST=VIC,C=AU')  SSLCERTI('CN=WINVMCA1,DC=melb,DC=ad ') ADDRESS('*') USERSRC(map) MCAUSER('app') ACTION(REPLACE)
+SET CHLAUTH('TS1DMA301.MQSFB.SVC') TYPE(blockuser) USERLIST('*MQADMIN') ACTION(replace)
+
+*** Enable admin user access to ADMIN channel
+SET CHLAUTH('TS1DMA301.ADMN.SVC') TYPE(BLOCKUSER) USERLIST('nobody') DESCR('Allows admins on ADMIN channel') ACTION(REPLACE)
+SET CHLAUTH('TS1DMA301.ADMN.SVC') TYPE(USERMAP) CLNTUSER('admin') USERSRC(CHANNEL) DESCR('Allows admin user to connect via ADMIN channel') ACTION(REPLACE)
+
+** Block unrecognised certs and issuers for gateway channels
+SET CHLAUTH(TS1DMA301.TS1TG0101) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER(' ') SSLCERTI(' ') USERSRC(NOACCESS) ACTION(REPLACE)
+SET CHLAUTH(TS1DMA301.TS1TG0201) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER(' ') SSLCERTI(' ') USERSRC(NOACCESS) ACTION(REPLACE)
+SET CHLAUTH(TS1TG0101.TS1DMA301) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER(' ') SSLCERTI(' ') USERSRC(NOACCESS) ACTION(REPLACE)
+SET CHLAUTH(TS1TG0201.TS1DMA301) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER(' ') SSLCERTI(' ') USERSRC(NOACCESS) ACTION(REPLACE)
+
+** Map approved cert/issuer pairs to a valid user
+SET CHLAUTH(TS1DMA301.TS1TG0101) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER('CN=TS1TG0101,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') SSLCERTI('C=AU,ST=VIC,L=Melbourne,O=ITSS,OU=DevOps CA,CN=VWA DevOps Untrusted CA') USERSRC(CHANNEL) ACTION(REPLACE)
+SET CHLAUTH(TS1DMA301.TS1TG0201) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER('CN=TS1TG0201,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') SSLCERTI('C=AU,ST=VIC,L=Melbourne,O=ITSS,OU=DevOps CA,CN=VWA DevOps Untrusted CA') USERSRC(CHANNEL) ACTION(REPLACE)
+SET CHLAUTH(TS1TG0101.TS1DMA301) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER('CN=TS1TG0101,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') SSLCERTI('C=AU,ST=VIC,L=Melbourne,O=ITSS,OU=DevOps CA,CN=VWA DevOps Untrusted CA') USERSRC(MAP) MCAUSER('_mq_chl_gwy') ACTION(REPLACE)
+SET CHLAUTH(TS1TG0201.TS1DMA301) TYPE(SSLPEERMAP) ADDRESS('*') SSLPEER('CN=TS1TG0201,OU=/TS1/,OU=IBM MQ QMgr,O=ITSS,L=Melbourne,ST=VIC,C=AU') SSLCERTI('C=AU,ST=VIC,L=Melbourne,O=ITSS,OU=DevOps CA,CN=VWA DevOps Untrusted CA') USERSRC(MAP) MCAUSER('_mq_chl_gwy') ACTION(REPLACE)
+
+** CONFIGURING CHANNELS AUTH RECORDS ENDS
+
+** CONFIGURING TOPICS STARTS
+
+** CONFIGURING TOPICS ENDS
+
+** CONFIGURING SUBSCRIPTIONS STARTS
+
+** CONFIGURING SUBSCRIPTIONS ENDS
+
+** CONFIGURING LOCAL QUEUES STARTS
+
+DEFINE QLOCAL('TEST.IN') REPLACE
+
+** CONFIGURING LOCAL QUEUES ENDS
+
+** CONFIGURING TRANSMISSION QUEUES STARTS
+
+* Transmission queue for gateway at EIP site 1
+DEFINE QLOCAL(XMITQ.GWY.PRIMARY) USAGE(XMITQ) TRIGGER TRIGTYPE(FIRST) TRIGDATA(TS1DMA301.TS1TG0101) INITQ(SYSTEM.CHANNEL.INITQ) REPLACE
+
+* Transmission queue for gateway at EIP site 2
+DEFINE QLOCAL(XMITQ.GWY.BACKUP) USAGE(XMITQ) TRIGGER TRIGTYPE(FIRST) TRIGDATA(TS1DMA301.TS1TG0201) INITQ(SYSTEM.CHANNEL.INITQ) REPLACE
+
+** CONFIGURING TRANSMISSION QUEUES ENDS
+
+** CONFIGURING REMOTE QUEUES STARTS
+
+* QRemote for IVP to Mainframe via gateway at site 1
+DEFINE QREMOTE(PRIMARY.CS.ACCTION.IVP) RNAME(ACCTION.IVP) RQMNAME(WSV) XMITQ(XMITQ.GWY.PRIMARY) DEFPSIST(YES) REPLACE
+
+* QRemote for IVP to Mainframe via gateway at site 2
+DEFINE QREMOTE(BACKUP.CS.ACCTION.IVP) RNAME(ACCTION.IVP) RQMNAME(WSV) XMITQ(XMITQ.GWY.BACKUP) DEFPSIST(YES) REPLACE
+
+* IIB Qmgr Alias remote queue 1 - defined for replies to return for each on-premises EIP IIB Qmgr
+DEFINE QREMOTE(TS1TI0101) RNAME('') RQMNAME(TS1TI0101) XMITQ(XMITQ.GWY.PRIMARY) DEFPSIST(YES) REPLACE
+
+* IIB Qmgr Alias remote queue 2 - defined for replies to return for each on-premises EIP IIB Qmgr
+DEFINE QREMOTE(TS1TI0201) RNAME('') RQMNAME(TS1TI0201) XMITQ(XMITQ.GWY.PRIMARY) DEFPSIST(YES) REPLACE
+
+** CONFIGURING REMOTE QUEUES ENDS
+
+** CONFIGURING ALIAS QUEUES STARTS
+
+* Qaliases to allow selection of gateway using an automation script
+* aliases must match the names of the QREMOTE definitions, but with the site designation (PRIMARY./BACKUP.) removed
+DEFINE QALIAS(CS.ACCTION.IVP) TARGTYPE(QUEUE) TARGET(PRIMARY.CS.ACCTION.IVP) DEFPSIST(YES) REPLACE
+
+** CONFIGURING ALIAS QUEUES ENDS
+
+** RESET SENDER CHANNELS TO ALLOW FOR REBUILD - STARTS
+
+* Reset sender channel to EIP site 1 gateway QM
+RESET CHANNEL(TS1DMA301.TS1TG0101)
+
+* Reset sender channel to EIP site 2 gateway QM
+RESET CHANNEL(TS1DMA301.TS1TG0201)
+
+** RESET SENDER CHANNELS TO ALLOW FOR REBUILD - ENDS
